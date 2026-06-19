@@ -37,6 +37,9 @@ class Settings:
         self.monad_rpc_url = os.getenv("MONAD_RPC_URL", "https://testnet-rpc.monad.xyz")
         self.chain_id = int(os.getenv("MONAD_CHAIN_ID", "10143"))
         self.explorer_url = os.getenv("EXPLORER_URL", "https://testnet.monadexplorer.com").rstrip("/")
+        self.network_name = os.getenv("MONAD_NETWORK_NAME", "Monad Testnet")
+        self.currency_symbol = os.getenv("MONAD_CURRENCY_SYMBOL", "MON")
+        self.faucet_url = os.getenv("MONAD_FAUCET_URL", "https://faucet.monad.xyz/")
         self.agent_private_key = os.getenv("AGENT_PRIVATE_KEY", "").strip()
         self.provider_registry_address = os.getenv("PROVIDER_REGISTRY_ADDRESS", "").strip()
         self.execution_attestation_address = os.getenv("EXECUTION_ATTESTATION_ADDRESS", "").strip()
@@ -91,6 +94,18 @@ class Settings:
             "chain_write": self.chain_write_enabled,
             "provider_registry": self.provider_registry_address or None,
             "execution_attestation": self.execution_attestation_address or None,
+        }
+
+    def chain_public(self) -> dict:
+        """Network params the frontend uses to add Monad testnet to a wallet + faucet info."""
+        return {
+            "chain_id": self.chain_id,
+            "chain_id_hex": hex(self.chain_id),
+            "network_name": self.network_name,
+            "rpc_url": self.monad_rpc_url,
+            "explorer_url": self.explorer_url,
+            "currency_symbol": self.currency_symbol,
+            "faucet_url": self.faucet_url,
         }
 
 

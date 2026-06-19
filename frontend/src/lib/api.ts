@@ -1,4 +1,4 @@
-import type { AuditBundle, Provider, Session, ActionItem } from "./types";
+import type { AuditBundle, BackendConfig, Provider, Session, ActionItem } from "./types";
 
 export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
@@ -27,6 +27,8 @@ export interface CreateSessionInput {
 }
 
 export const api = {
+  getConfig: () => req<BackendConfig>("/config"),
+
   getProviders: () => req<{ providers: Provider[]; on_chain: boolean }>("/providers"),
 
   createSession: (body: CreateSessionInput) =>

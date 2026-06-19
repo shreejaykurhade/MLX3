@@ -72,6 +72,24 @@ export function HashChip({ value, href, label }: { value?: string | null; href?:
   );
 }
 
+export function Copyable({ value, mono = true }: { value: string; mono?: boolean }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      onClick={() => {
+        navigator.clipboard?.writeText(value);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1000);
+      }}
+      className="inline-flex max-w-full items-center gap-1.5 rounded bg-panel2 px-2 py-1 text-left hover:bg-panel"
+      title="Copy"
+    >
+      <span className={`${mono ? "mono" : "text-sm"} truncate text-gray-200`}>{value}</span>
+      <span className="shrink-0 text-muted">{copied ? "✓" : "⧉"}</span>
+    </button>
+  );
+}
+
 export function Spinner() {
   return (
     <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-edge border-t-brand" aria-hidden />

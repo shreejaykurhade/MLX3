@@ -87,6 +87,33 @@ async def health() -> Dict[str, Any]:
     return {"ok": True, "chain": chain.status(), "config": settings.summary()}
 
 
+@app.get("/config")
+async def config() -> Dict[str, Any]:
+    """Network params + faucet + agent-wallet status for the frontend setup page.
+
+    The *agent* wallet (derived from AGENT_PRIVATE_KEY) is the account that signs
+    on-chain attestations — fund THIS address from the faucet to submit real txs.
+    """
+    st = chain.status()
+    agent_address = st.get("agent_address")
+    agent_balance = await chain.get_balance(agent_address)
+    return {
+        "chain": settings.chain_public(),
+        "contracts": {
+            "provider_registry": settings.provider_registry_address or None,
+            "execution_attestation": settings.execution_attestation_address or None,
+        },
+        "agent": {
+            "address": agent_address,
+            "balance_wei": str(agent_balance) if agent_balance is not None else None,
+            # real on-chain submission needs both a loaded agent key and a deployed contract
+            "write_enabled": bool(agent_address) and bool(settings.execution_attestation_address),
+        },
+        "mode": settings.summary(),
+        "rpc_connected": st.get("connected"),
+    }
+
+
 @app.get("/providers")
 async def providers() -> Dict[str, Any]:
     from .tools import DEFAULT_PROVIDER

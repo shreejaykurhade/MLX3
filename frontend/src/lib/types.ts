@@ -88,6 +88,22 @@ export interface AuditBundle {
   };
 }
 
+export interface BackendConfig {
+  chain: {
+    chain_id: number;
+    chain_id_hex: string;
+    network_name: string;
+    rpc_url: string;
+    explorer_url: string;
+    currency_symbol: string;
+    faucet_url: string;
+  };
+  contracts: { provider_registry: string | null; execution_attestation: string | null };
+  agent: { address: string | null; balance_wei: string | null; write_enabled: boolean };
+  mode: { agent: string; store: string; chain_read: boolean; chain_write: boolean };
+  rpc_connected: boolean;
+}
+
 export interface WSEvent {
   type:
     | "snapshot"

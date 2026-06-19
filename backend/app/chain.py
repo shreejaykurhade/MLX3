@@ -107,10 +107,27 @@ class ChainClient:
                     address=Web3.to_checksum_address(settings.execution_attestation_address),
                     abi=EXECUTION_ATTESTATION_ABI,
                 )
-            if settings.agent_private_key:
-                self._account = self._w3.eth.account.from_key(settings.agent_private_key)
+            self._load_account()
         except Exception as e:
             self._init_error = str(e)
+
+    def _load_account(self) -> None:
+        """Load the agent signing account from AGENT_PRIVATE_KEY, tolerating a missing
+        0x prefix and skipping unset/placeholder values without raising."""
+        pk = settings.agent_private_key.strip()
+        if not pk or pk.upper().endswith("YOUR_AGENT_PRIVATE_KEY"):
+            return
+        if not pk.startswith("0x"):
+            pk = "0x" + pk
+        body = pk[2:]
+        if len(body) != 64 or any(c not in "0123456789abcdefABCDEF" for c in body):
+            print("[chain] AGENT_PRIVATE_KEY is not a 32-byte hex key — on-chain submission stays simulated")
+            return
+        try:
+            self._account = self._w3.eth.account.from_key(pk)
+            print(f"[chain] agent wallet loaded: {self._account.address}")
+        except Exception as e:  # pragma: no cover
+            print(f"[chain] could not load AGENT_PRIVATE_KEY: {e}")
 
     # ----------------------------------------------------------------- #
 
@@ -151,6 +168,21 @@ class ChainClient:
                 }
             )
         return providers
+
+    async def get_balance(self, address: Optional[str]) -> Optional[int]:
+        """Native MON balance (wei) of an address, or None if unavailable."""
+        if not address or self._w3 is None:
+            return None
+        import asyncio
+
+        def _call():
+            checksum = self._Web3.to_checksum_address(address)
+            return int(self._w3.eth.get_balance(checksum))
+
+        try:
+            return await asyncio.to_thread(_call)
+        except Exception:
+            return None
 
     async def submit_attestation(
         self, session_id_bytes32: str, merkle_root_hex: str, provider_address: Optional[str], leaf_count: int

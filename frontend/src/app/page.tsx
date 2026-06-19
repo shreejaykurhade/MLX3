@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAuth } from "@/components/AuthProvider";
+import { NetworkStatus } from "@/components/NetworkStatus";
 import { ProviderList } from "@/components/ProviderList";
 import { SessionList } from "@/components/SessionList";
 import { Spinner } from "@/components/ui";
@@ -55,6 +56,14 @@ export default function Dashboard() {
           )}
           {error && <p className="mt-2 text-sm text-bad">{error}</p>}
         </div>
+        {isConnected && (
+          <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-edge pt-4 text-sm">
+            <NetworkStatus compact />
+            <Link href="/setup" className="text-brand2 hover:underline">
+              Need testnet MON? Get it on Setup →
+            </Link>
+          </div>
+        )}
       </section>
 
       <section>
