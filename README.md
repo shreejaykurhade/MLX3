@@ -1,5 +1,7 @@
 # MLX3 — Verifiable Agent Execution on Monad
 
+<img src="./Landingpage.png" alt="MLX3 Landing Page" width="600" />
+
 MLX3 is a decentralized **verifiable agent execution** platform. A user submits a task, an
 AI agent (Anthropic Claude) plans and executes it, **every action is SHA-256 hashed into a
 Merkle tree**, and the Merkle root is committed on-chain to Monad testnet — so anyone can
