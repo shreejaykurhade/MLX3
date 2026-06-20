@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background-color: #0a0a0f;
+  color: #e7e7ee;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl border border-edge bg-panel p-5;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-brand text-white hover:bg-brand2;
+  }
+  .btn-ghost {
+    @apply btn border border-edge bg-panel2 text-gray-200 hover:border-brand;
+  }
+  .btn-danger {
+    @apply btn border border-edge bg-panel2 text-bad hover:border-bad;
+  }
+  .label {
+    @apply text-xs uppercase tracking-wide text-muted;
+  }
+  .mono {
+    @apply font-mono text-xs;
+  }
+  .input {
+    @apply w-full rounded-lg border border-edge bg-panel2 px-3 py-2 text-sm text-gray-100 outline-none placeholder:text-muted focus:border-brand;
+  }
+}
+
+/* thin scrollbars for the live log */
+.scroll-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: #2a2a3a;
+  border-radius: 4px;
+}
