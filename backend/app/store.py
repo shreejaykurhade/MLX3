@@ -56,6 +56,12 @@ class InMemoryStore(BaseStore):
                 "task_prompt": data.get("task_prompt"),
                 "task_type": data.get("task_type", "prompt"),
                 "github_url": data.get("github_url"),
+                "deployment_status": None,
+                "deployment_slug": None,
+                "deployment_url": None,
+                "deployment_container_id": None,
+                "deployment_image": None,
+                "deployment_port": None,
                 "status": "created",
                 "provider_address": None,
                 "plan": None,
@@ -139,6 +145,7 @@ class SupabaseStore(BaseStore):
             "task_prompt": data.get("task_prompt"),
             "task_type": data.get("task_type", "prompt"),
             "github_url": data.get("github_url"),
+            "deployment_status": None,
             "status": "created",
             "leaf_count": 0,
         }
@@ -198,7 +205,187 @@ class SupabaseStore(BaseStore):
         return res.count or 0
 
 
+# --------------------------------------------------------------------------- #
+#  Direct PostgreSQL
+# --------------------------------------------------------------------------- #
+
+class PostgresStore(BaseStore):
+    """Small psycopg store for production deployments configured by DATABASE_URL."""
+
+    SESSION_COLUMNS = {
+        "wallet_address", "task_prompt", "task_type", "github_url", "status",
+        "provider_address", "plan", "merkle_root", "attestation_tx",
+        "session_id_bytes32", "leaf_count", "simulated", "error",
+        "deployment_status", "deployment_slug", "deployment_url",
+        "deployment_container_id", "deployment_image", "deployment_port",
+    }
+    ACTION_COLUMNS = {"committed"}
+
+    def __init__(self) -> None:
+        import psycopg
+
+        self._psycopg = psycopg
+        self._initialize()
+
+    def _connect(self):
+        from psycopg.rows import dict_row
+
+        return self._psycopg.connect(settings.database_url, row_factory=dict_row)
+
+    def _initialize(self) -> None:
+        ddl = """
+        create table if not exists sessions (
+            id uuid primary key, wallet_address text, task_prompt text not null,
+            task_type text not null default 'prompt', github_url text,
+            status text not null default 'created', provider_address text, plan jsonb,
+            merkle_root text, attestation_tx text, session_id_bytes32 text,
+            leaf_count integer not null default 0, simulated boolean, error text,
+            deployment_status text, deployment_slug text, deployment_url text,
+            deployment_container_id text, deployment_image text, deployment_port integer,
+            created_at timestamptz not null default now(), updated_at timestamptz not null default now()
+        );
+        create table if not exists actions (
+            id uuid primary key, session_id uuid not null references sessions(id) on delete cascade,
+            seq integer not null, type text not null, title text not null, data jsonb,
+            is_leaf boolean not null default false, leaf_index integer, canonical text,
+            leaf_hash text, committed boolean not null default false,
+            created_at timestamptz not null default now(), unique(session_id, seq)
+        );
+        create index if not exists idx_actions_session on actions(session_id, seq);
+        create index if not exists idx_sessions_wallet on sessions(wallet_address);
+        alter table sessions add column if not exists deployment_status text;
+        alter table sessions add column if not exists deployment_slug text;
+        alter table sessions add column if not exists deployment_url text;
+        alter table sessions add column if not exists deployment_container_id text;
+        alter table sessions add column if not exists deployment_image text;
+        alter table sessions add column if not exists deployment_port integer;
+        """
+        with self._connect() as conn:
+            conn.execute(ddl)
+
+    @staticmethod
+    def _normalize(row):
+        if not row:
+            return row
+        result = dict(row)
+        for key in ("id", "session_id"):
+            if result.get(key) is not None:
+                result[key] = str(result[key])
+        for key in ("created_at", "updated_at"):
+            if hasattr(result.get(key), "isoformat"):
+                result[key] = result[key].isoformat()
+        return result
+
+    async def _run(self, fn):
+        return await asyncio.to_thread(fn)
+
+    async def create_session(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        sid = data.get("id") or new_id()
+        values = (
+            sid, data.get("wallet_address"), data.get("task_prompt"),
+            data.get("task_type", "prompt"), data.get("github_url"),
+        )
+        def query():
+            with self._connect() as conn:
+                row = conn.execute(
+                    "insert into sessions (id,wallet_address,task_prompt,task_type,github_url) "
+                    "values (%s,%s,%s,%s,%s) returning *", values,
+                ).fetchone()
+                return self._normalize(row)
+        return await self._run(query)
+
+    async def get_session(self, session_id: str) -> Optional[Dict[str, Any]]:
+        def query():
+            with self._connect() as conn:
+                return self._normalize(conn.execute("select * from sessions where id=%s", (session_id,)).fetchone())
+        return await self._run(query)
+
+    async def update_session(self, session_id: str, **fields: Any) -> Optional[Dict[str, Any]]:
+        from psycopg.types.json import Jsonb
+
+        fields = {k: v for k, v in fields.items() if k in self.SESSION_COLUMNS}
+        if not fields:
+            return await self.get_session(session_id)
+        assignments = ", ".join(f"{key}=%s" for key in fields)
+        values = [Jsonb(v) if key == "plan" and v is not None else v for key, v in fields.items()]
+        values.append(session_id)
+        def query():
+            with self._connect() as conn:
+                row = conn.execute(
+                    f"update sessions set {assignments}, updated_at=now() where id=%s returning *", values,
+                ).fetchone()
+                return self._normalize(row)
+        return await self._run(query)
+
+    async def list_sessions(self, wallet_address: Optional[str] = None, limit: int = 50) -> List[Dict[str, Any]]:
+        def query():
+            with self._connect() as conn:
+                if wallet_address:
+                    rows = conn.execute(
+                        "select * from sessions where lower(wallet_address)=lower(%s) order by created_at desc limit %s",
+                        (wallet_address, limit),
+                    ).fetchall()
+                else:
+                    rows = conn.execute("select * from sessions order by created_at desc limit %s", (limit,)).fetchall()
+                return [self._normalize(row) for row in rows]
+        return await self._run(query)
+
+    async def add_action(self, action: Dict[str, Any]) -> Dict[str, Any]:
+        from psycopg.types.json import Jsonb
+
+        values = (
+            action["id"], action["session_id"], action["seq"], action["type"], action["title"],
+            Jsonb(action.get("data")), action.get("is_leaf", False), action.get("leaf_index"),
+            action.get("canonical"), action.get("leaf_hash"), action.get("committed", False),
+        )
+        def query():
+            with self._connect() as conn:
+                row = conn.execute(
+                    "insert into actions (id,session_id,seq,type,title,data,is_leaf,leaf_index,canonical,leaf_hash,committed) "
+                    "values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) returning *", values,
+                ).fetchone()
+                return self._normalize(row)
+        return await self._run(query)
+
+    async def get_actions(self, session_id: str) -> List[Dict[str, Any]]:
+        def query():
+            with self._connect() as conn:
+                rows = conn.execute("select * from actions where session_id=%s order by seq", (session_id,)).fetchall()
+                return [self._normalize(row) for row in rows]
+        return await self._run(query)
+
+    async def update_action(self, action_id: str, **fields: Any) -> None:
+        fields = {k: v for k, v in fields.items() if k in self.ACTION_COLUMNS}
+        if not fields:
+            return
+        assignments = ", ".join(f"{key}=%s" for key in fields)
+        values = [*fields.values(), action_id]
+        await self._run(lambda: self._update_action_sync(assignments, values))
+
+    def _update_action_sync(self, assignments: str, values: List[Any]) -> None:
+        with self._connect() as conn:
+            conn.execute(f"update actions set {assignments} where id=%s", values)
+
+    async def count_actions(self, session_id: str) -> int:
+        return await self._count(session_id, False)
+
+    async def count_leaves(self, session_id: str) -> int:
+        return await self._count(session_id, True)
+
+    async def _count(self, session_id: str, leaves_only: bool) -> int:
+        suffix = " and is_leaf=true" if leaves_only else ""
+        def query():
+            with self._connect() as conn:
+                return int(conn.execute(f"select count(*) as n from actions where session_id=%s{suffix}", (session_id,)).fetchone()["n"])
+        return await self._run(query)
+
+
 def build_store() -> BaseStore:
+    if settings.database_enabled:
+        try:
+            return PostgresStore()
+        except Exception as e:
+            print(f"[store] Postgres init failed ({e}); falling back")
     if settings.supabase_enabled:
         try:
             return SupabaseStore()

@@ -275,10 +275,20 @@ class AgentContext:
             session_id_bytes32=sid_b32,
             simulated=result.get("simulated", True),
         )
+        deployment = {
+            "deployment_status": self.session.get("deployment_status"),
+            "deployment_slug": self.session.get("deployment_slug"),
+            "deployment_url": self.session.get("deployment_url"),
+        }
         await self.ws.broadcast(
             self.session_id,
             "completed",
-            {**self.attestation, "merkle_root": self.merkle_root, "leaf_count": len(leaves)},
+            {
+                **self.attestation,
+                **deployment,
+                "merkle_root": self.merkle_root,
+                "leaf_count": len(leaves),
+            },
         )
         return self.attestation
 

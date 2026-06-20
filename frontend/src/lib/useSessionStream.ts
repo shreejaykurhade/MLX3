@@ -12,6 +12,9 @@ export interface Completion {
   explorer_url?: string;
   leaf_count?: number;
   block_number?: number | null;
+  deployment_status?: string | null;
+  deployment_slug?: string | null;
+  deployment_url?: string | null;
 }
 
 export interface StreamState {
@@ -75,6 +78,15 @@ export function useSessionStream(sessionId: string | null): StreamState {
         case "merkle_root":
           if (next.session) next.session = { ...next.session, merkle_root: ev.data.merkle_root, leaf_count: ev.data.leaf_count };
           break;
+        case "deployment":
+          if (next.session)
+            next.session = {
+              ...next.session,
+              deployment_status: ev.data.status,
+              deployment_url: ev.data.url ?? next.session.deployment_url,
+              deployment_slug: ev.data.slug ?? next.session.deployment_slug,
+            };
+          break;
         case "completed":
           next.completion = ev.data as Completion;
           next.status = "completed";
@@ -86,6 +98,9 @@ export function useSessionStream(sessionId: string | null): StreamState {
               attestation_tx: ev.data.tx_hash,
               session_id_bytes32: ev.data.session_id_bytes32,
               simulated: ev.data.simulated,
+              deployment_status: ev.data.deployment_status,
+              deployment_url: ev.data.deployment_url,
+              deployment_slug: ev.data.deployment_slug,
             };
           break;
         case "error":
@@ -123,6 +138,9 @@ export function useSessionStream(sessionId: string | null): StreamState {
                   simulated: !!session.simulated,
                   session_id_bytes32: session.session_id_bytes32 ?? undefined,
                   leaf_count: session.leaf_count,
+                  deployment_status: session.deployment_status,
+                  deployment_url: session.deployment_url,
+                  deployment_slug: session.deployment_slug,
                 }
               : prev.completion,
         }));

@@ -3,9 +3,14 @@ import type { AuditBundle, BackendConfig, Provider, Session, ActionItem } from "
 export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = typeof window !== "undefined" ? window.localStorage.getItem("mlx3_auth_token") : null;
   const res = await fetch(`${BACKEND_URL}${path}`, {
     ...init,
-    headers: { "Content-Type": "application/json", ...(init?.headers || {}) },
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(init?.headers || {}),
+    },
   });
   if (!res.ok) {
     let detail = res.statusText;
@@ -50,7 +55,10 @@ export const api = {
   nonce: () => req<{ nonce: string }>("/auth/nonce"),
 
   verify: (body: { address: string; message: string; signature: string }) =>
-    req<{ ok: boolean; address: string }>("/auth/verify", { method: "POST", body: JSON.stringify(body) }),
+    req<{ ok: boolean; address: string; token: string; expires_in: number }>("/auth/verify", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
 };
 
 export function wsUrl(sessionId: string): string {

@@ -39,7 +39,7 @@ python -m app.merkle           # self-test over tree sizes 1,2,3,5,8,9
 |---|---|---|
 | `analyze_task` | plan | reads on-chain providers; logs a leaf |
 | `make_plan` | plan | selects a provider, records the plan, **pauses for confirmation**; logs a leaf |
-| `execute_step` | exec | runs a mocked-but-realistic step; logs a leaf |
+| `execute_step` | exec | runs a task step; public GitHub sessions use the real Docker deployer |
 | `hash_action` | exec | commits pending actions into the Merkle log (streams `leaf_committed`) |
 | `build_merkle_root` | exec | builds the SHA-256 tree, computes the root |
 | `submit_attestation` | exec | submits the root to Monad (or simulates) |

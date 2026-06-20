@@ -23,6 +23,7 @@ const Ctx = createContext<AuthCtx>({
 });
 
 const STORAGE_KEY = "mlx3_siwe_address";
+const TOKEN_KEY = "mlx3_auth_token";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { address } = useAccount();
@@ -36,7 +37,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSignedAddr(window.localStorage.getItem(STORAGE_KEY));
   }, []);
 
-  const signedIn = !!address && !!signedAddr && signedAddr.toLowerCase() === address.toLowerCase();
+  const signedIn =
+    !!address &&
+    !!signedAddr &&
+    !!(typeof window !== "undefined" && window.localStorage.getItem(TOKEN_KEY)) &&
+    signedAddr.toLowerCase() === address.toLowerCase();
 
   async function signIn() {
     if (!address) return;
@@ -55,6 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const res = await api.verify({ address, message, signature });
       if (!res.ok) throw new Error("verification failed");
       window.localStorage.setItem(STORAGE_KEY, address);
+      window.localStorage.setItem(TOKEN_KEY, res.token);
       setSignedAddr(address);
     } catch (e: any) {
       setError(e?.shortMessage || e?.message || "sign-in failed");
@@ -65,6 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   function signOut() {
     window.localStorage.removeItem(STORAGE_KEY);
+    window.localStorage.removeItem(TOKEN_KEY);
     setSignedAddr(null);
   }
 

@@ -101,6 +101,7 @@ export default function DeployPage() {
                 simulated={stream.completion.simulated}
                 explorerUrl={stream.completion.explorer_url}
                 leafCount={stream.completion.leaf_count}
+                deploymentUrl={stream.completion.deployment_url}
               />
             )}
             {rejected && (

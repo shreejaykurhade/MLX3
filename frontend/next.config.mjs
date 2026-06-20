@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "standalone",
   // We lint separately; don't block production builds on ESLint.
   eslint: { ignoreDuringBuilds: true },
   // Turbopack (used for `dev` and `build`) resolves the optional native deps that

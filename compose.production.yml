@@ -1,0 +1,119 @@
+name: mlx3
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mlx3
+      POSTGRES_USER: mlx3
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mlx3 -d mlx3"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - internal
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    env_file:
+      - path: .env.production
+        required: false
+    environment:
+      PORT: 8080
+      CORS_ORIGINS: https://${APP_DOMAIN}
+      DEPLOY_DOMAIN: ${DEPLOY_DOMAIN}
+      DEPLOY_NETWORK: mlx3_proxy
+      DATABASE_URL: postgresql://mlx3:${POSTGRES_PASSWORD}@postgres:5432/mlx3
+      SIWE_DOMAIN: ${APP_DOMAIN}
+    expose:
+      - "8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - proxy
+      - internal
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=mlx3_proxy
+      - traefik.http.routers.mlx3-api.rule=Host(`${API_DOMAIN}`)
+      - traefik.http.routers.mlx3-api.entrypoints=websecure
+      - traefik.http.routers.mlx3-api.tls.certresolver=letsencrypt
+      - traefik.http.services.mlx3-api.loadbalancer.server.port=8080
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_BACKEND_URL: https://${API_DOMAIN}
+        NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID}
+        NEXT_PUBLIC_MONAD_CHAIN_ID: ${NEXT_PUBLIC_MONAD_CHAIN_ID:-10143}
+        NEXT_PUBLIC_MONAD_RPC_URL: ${NEXT_PUBLIC_MONAD_RPC_URL:-https://testnet-rpc.monad.xyz}
+        NEXT_PUBLIC_EXPLORER_URL: ${NEXT_PUBLIC_EXPLORER_URL:-https://testnet.monadexplorer.com}
+        NEXT_PUBLIC_PROVIDER_REGISTRY_ADDRESS: ${NEXT_PUBLIC_PROVIDER_REGISTRY_ADDRESS}
+        NEXT_PUBLIC_EXECUTION_ATTESTATION_ADDRESS: ${NEXT_PUBLIC_EXECUTION_ATTESTATION_ADDRESS}
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    expose:
+      - "3000"
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=mlx3_proxy
+      - traefik.http.routers.mlx3-app.rule=Host(`${APP_DOMAIN}`)
+      - traefik.http.routers.mlx3-app.entrypoints=websecure
+      - traefik.http.routers.mlx3-app.tls.certresolver=letsencrypt
+      - traefik.http.services.mlx3-app.loadbalancer.server.port=3000
+
+  traefik:
+    image: traefik:v3.5
+    restart: unless-stopped
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=mlx3_proxy
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web
+      - --api.dashboard=false
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_data:/letsencrypt
+    networks:
+      - proxy
+
+volumes:
+  traefik_data:
+  postgres_data:
+
+networks:
+  proxy:
+    name: mlx3_proxy
+  internal:
+    name: mlx3_internal
+    internal: true

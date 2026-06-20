@@ -94,7 +94,10 @@ class AgentRunner:
             await self._exec_phase()
             await self._finalize()
         except Exception as e:  # noqa: BLE001 — surface any failure to the UI
-            await self.ctx.store.update_session(self.session_id, status="failed", error=str(e))
+            fields = {"status": "failed", "error": str(e)}
+            if self.ctx.session.get("task_type") == "github":
+                fields["deployment_status"] = "failed"
+            await self.ctx.store.update_session(self.session_id, **fields)
             await self.ctx.ws.broadcast(self.session_id, "error", {"message": str(e)})
 
     async def _wait_confirm(self) -> bool:
@@ -120,6 +123,9 @@ class AgentRunner:
         )
 
     async def _exec_phase(self) -> None:
+        if self.ctx.session.get("task_type") == "github" and self.ctx.session.get("github_url"):
+            await self._deploy_github()
+            return
         if self._client is None:
             await self._mock_exec()
             return
@@ -129,6 +135,42 @@ class AgentRunner:
             tool_defs=tools.EXECUTION_TOOLS,
             first_user=first,
             stop_when=lambda: self.ctx.attestation is not None,
+        )
+
+    async def _deploy_github(self) -> None:
+        from .deployer import deploy_repository
+
+        await self.ctx.store.update_session(self.session_id, deployment_status="building")
+        await self.ctx.ws.broadcast(self.session_id, "deployment", {"status": "building"})
+        result = await deploy_repository(
+            self.ctx.session["github_url"], self.session_id, self.ctx.emit_log
+        )
+        deployment = {
+            "deployment_status": "running",
+            "deployment_slug": result.slug,
+            "deployment_url": result.url,
+            "deployment_container_id": result.container_id,
+            "deployment_image": result.image,
+            "deployment_port": result.container_port,
+        }
+        self.ctx.session.update(deployment)
+        await self.ctx.store.update_session(self.session_id, **deployment)
+        await self.ctx.log_action(
+            "execute_step",
+            "Deployed public GitHub repository",
+            {
+                "repository": self.ctx.session["github_url"],
+                "deployment_url": result.url,
+                "container_id": result.container_id,
+                "image": result.image,
+                "container_port": result.container_port,
+                "exit_code": 0,
+            },
+        )
+        await self.ctx.ws.broadcast(
+            self.session_id,
+            "deployment",
+            {"status": "running", "url": result.url, "slug": result.slug},
         )
 
     def _planning_prompt(self) -> str:

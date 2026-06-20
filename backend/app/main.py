@@ -16,12 +16,14 @@ Endpoints
 from __future__ import annotations
 
 import asyncio
+import re
 import secrets
 import time
 from typing import Any, Dict, Optional
 
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import Depends, FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from . import merkle
 from .agent import AgentRunner
@@ -46,6 +48,20 @@ chain = ChainClient()
 ws_manager = WSManager()
 runners: Dict[str, AgentRunner] = {}
 _nonces: Dict[str, float] = {}
+_bearer = HTTPBearer(auto_error=True)
+
+
+def require_auth(credentials: HTTPAuthorizationCredentials = Depends(_bearer)) -> str:
+    if not settings.jwt_secret:
+        raise HTTPException(503, "JWT_SECRET is not configured")
+    try:
+        import jwt
+
+        payload = jwt.decode(credentials.credentials, settings.jwt_secret, algorithms=["HS256"])
+        address = str(payload["sub"])
+    except Exception as exc:
+        raise HTTPException(401, "invalid or expired authentication token") from exc
+    return address
 
 
 # --------------------------------------------------------------------------- #
@@ -59,6 +75,12 @@ def session_public(s: Dict[str, Any]) -> Dict[str, Any]:
         "task_prompt": s.get("task_prompt"),
         "task_type": s.get("task_type"),
         "github_url": s.get("github_url"),
+        "deployment_status": s.get("deployment_status"),
+        "deployment_slug": s.get("deployment_slug"),
+        "deployment_url": s.get("deployment_url"),
+        "deployment_container_id": s.get("deployment_container_id"),
+        "deployment_image": s.get("deployment_image"),
+        "deployment_port": s.get("deployment_port"),
         "status": s.get("status"),
         "provider_address": s.get("provider_address"),
         "plan": s.get("plan"),
@@ -110,6 +132,10 @@ async def config() -> Dict[str, Any]:
             "write_enabled": bool(agent_address) and bool(settings.execution_attestation_address),
         },
         "mode": settings.summary(),
+        "deployments": {
+            "enabled": settings.deploy_enabled,
+            "domain": settings.deploy_domain or None,
+        },
         "rpc_connected": st.get("connected"),
     }
 
@@ -128,7 +154,9 @@ async def providers() -> Dict[str, Any]:
 # --------------------------------------------------------------------------- #
 
 @app.post("/sessions")
-async def create_session(req: CreateSessionRequest) -> Dict[str, Any]:
+async def create_session(req: CreateSessionRequest, authenticated_address: str = Depends(require_auth)) -> Dict[str, Any]:
+    if req.wallet_address.lower() != authenticated_address.lower():
+        raise HTTPException(403, "authenticated wallet does not match session wallet")
     session = await store.create_session(req.model_dump())
     runner = AgentRunner(session, store, chain, ws_manager)
     runners[session["id"]] = runner
@@ -152,10 +180,14 @@ async def get_session(session_id: str) -> Dict[str, Any]:
 
 
 @app.post("/sessions/{session_id}/confirm")
-async def confirm_session(session_id: str, req: ConfirmRequest) -> Dict[str, Any]:
+async def confirm_session(
+    session_id: str, req: ConfirmRequest, authenticated_address: str = Depends(require_auth)
+) -> Dict[str, Any]:
     s = await store.get_session(session_id)
     if not s:
         raise HTTPException(404, "session not found")
+    if (s.get("wallet_address") or "").lower() != authenticated_address.lower():
+        raise HTTPException(403, "session belongs to another wallet")
     runner = runners.get(session_id)
     if runner is None:
         raise HTTPException(409, "no active run for this session (it may have finished or the server restarted)")
@@ -264,6 +296,17 @@ async def auth_nonce() -> Dict[str, str]:
 
 @app.post("/auth/verify")
 async def auth_verify(req: AuthVerifyRequest) -> Dict[str, Any]:
+    if settings.siwe_domain:
+        expected_prefix = f"{settings.siwe_domain} wants you to sign in with your Ethereum account:\n"
+        if not req.message.startswith(expected_prefix):
+            raise HTTPException(400, "SIWE domain does not match this deployment")
+    if f"Chain ID: {settings.chain_id}" not in req.message:
+        raise HTTPException(400, "SIWE chain ID does not match this deployment")
+    nonce_match = re.search(r"^Nonce: ([A-Fa-f0-9]+)$", req.message, re.MULTILINE)
+    nonce = nonce_match.group(1) if nonce_match else ""
+    issued_at = _nonces.pop(nonce, None)
+    if not issued_at or issued_at < time.time() - 600:
+        raise HTTPException(400, "missing, expired, or already-used nonce")
     try:
         from eth_account import Account
         from eth_account.messages import encode_defunct
@@ -275,7 +318,17 @@ async def auth_verify(req: AuthVerifyRequest) -> Dict[str, Any]:
     ok = recovered.lower() == req.address.lower()
     if not ok:
         raise HTTPException(401, "signature does not match address")
-    return {"ok": True, "address": recovered}
+    if not settings.jwt_secret:
+        raise HTTPException(503, "JWT_SECRET is not configured")
+    import jwt
+
+    now = int(time.time())
+    token = jwt.encode(
+        {"sub": recovered, "iat": now, "exp": now + settings.jwt_ttl_seconds},
+        settings.jwt_secret,
+        algorithm="HS256",
+    )
+    return {"ok": True, "address": recovered, "token": token, "expires_in": settings.jwt_ttl_seconds}
 
 
 @app.on_event("startup")

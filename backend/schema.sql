@@ -8,6 +8,12 @@ create table if not exists sessions (
     task_prompt         text not null,
     task_type           text not null default 'prompt',
     github_url          text,
+    deployment_status   text,
+    deployment_slug     text,
+    deployment_url      text,
+    deployment_container_id text,
+    deployment_image    text,
+    deployment_port     integer,
     status              text not null default 'created',
     provider_address    text,
     plan                jsonb,
@@ -51,3 +57,10 @@ create table if not exists providers (
 create index if not exists idx_actions_session on actions(session_id, seq);
 create index if not exists idx_sessions_wallet on sessions(wallet_address);
 create index if not exists idx_sessions_created on sessions(created_at desc);
+
+alter table sessions add column if not exists deployment_status text;
+alter table sessions add column if not exists deployment_slug text;
+alter table sessions add column if not exists deployment_url text;
+alter table sessions add column if not exists deployment_container_id text;
+alter table sessions add column if not exists deployment_image text;
+alter table sessions add column if not exists deployment_port integer;

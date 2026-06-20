@@ -89,6 +89,12 @@ and frontend will read in later steps.
 ## Status
 
 - [x] **Step 1** — contracts, Hardhat config, deploy/seed scripts, Merkle test suite
-- [ ] Step 2 — FastAPI backend
-- [ ] Step 3 — Next.js frontend
-- [ ] Step 4 — wire ABIs + end-to-end on Monad testnet
+- [x] Step 2 — FastAPI backend
+- [x] Step 3 — Next.js frontend
+- [x] Step 4 — wire ABIs + end-to-end on Monad testnet
+
+## Public repository deployments
+
+Confirmed GitHub sessions clone, build, and run public repositories as resource-limited
+Docker containers. Traefik routes each container to a generated hostname below
+`DEPLOY_DOMAIN`. See [DEPLOYMENT.md](DEPLOYMENT.md) for server and DNS setup.

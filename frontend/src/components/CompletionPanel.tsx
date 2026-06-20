@@ -11,6 +11,7 @@ export function CompletionPanel({
   explorerUrl,
   leafCount,
   showAuditLink = true,
+  deploymentUrl,
 }: {
   sessionId: string;
   merkleRoot?: string | null;
@@ -19,6 +20,7 @@ export function CompletionPanel({
   explorerUrl?: string | null;
   leafCount?: number;
   showAuditLink?: boolean;
+  deploymentUrl?: string | null;
 }) {
   return (
     <div className="card border-ok/40">
@@ -59,6 +61,11 @@ export function CompletionPanel({
       )}
 
       <div className="mt-4 flex gap-3">
+        {deploymentUrl && (
+          <a href={deploymentUrl} target="_blank" rel="noreferrer" className="btn-primary flex-1">
+            Open deployment
+          </a>
+        )}
         {showAuditLink && (
           <Link href={`/audit?session=${sessionId}`} className="btn-primary flex-1">
             Open audit & verify →

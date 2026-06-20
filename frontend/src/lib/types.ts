@@ -33,6 +33,12 @@ export interface Session {
   task_prompt?: string;
   task_type?: "prompt" | "github";
   github_url?: string | null;
+  deployment_status?: "building" | "running" | "failed" | null;
+  deployment_slug?: string | null;
+  deployment_url?: string | null;
+  deployment_container_id?: string | null;
+  deployment_image?: string | null;
+  deployment_port?: number | null;
   status: SessionStatus;
   provider_address?: string | null;
   plan?: Plan | null;
@@ -114,6 +120,7 @@ export interface WSEvent {
     | "log"
     | "merkle_root"
     | "completed"
+    | "deployment"
     | "error";
   session_id?: string;
   ts?: string;
