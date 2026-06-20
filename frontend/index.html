@@ -12,7 +12,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=9" />
+  <link rel="stylesheet" href="style.css?v=15" />
 </head>
 
 <body>
@@ -37,7 +37,7 @@
         <span class="nav-tabs-cursor" id="nav-tabs-cursor"></span>
       </div>
       <div class="nav-actions">
-        <a href="https://github.com/Arnab-Afk/hackx" target="_blank" rel="noopener noreferrer" class="btn-ghost">
+        <a href="https://github.com/shreejaykurhade/MLX3" target="_blank" rel="noopener noreferrer" class="btn-ghost">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
             <path
               d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
@@ -65,19 +65,19 @@
       </h1>
       <p class="hero-sub">We are the only one that proves you cannot.</p>
       <p class="hero-desc">
-        Describe your stack in plain English. An AI agent deploys it in under 60 seconds with LUKS-encrypted containers,
+        Describe your stack in plain English. An AI agent deploys it in under 60 seconds with SHA256-encrypted containers,
         per-provider EAS attestation, and x402 micropayments.
       </p>
       <div class="hero-ctas">
         <a href="http://localhost:3000/signin" target="_blank" rel="noopener noreferrer"
           class="btn-primary btn-lg">Launch App</a>
-        <a href="https://github.com/Arnab-Afk/hackx" target="_blank" rel="noopener noreferrer"
+        <a href="https://github.com/shreejaykurhade/MLX3" target="_blank" rel="noopener noreferrer"
           class="btn-outline btn-lg">View on GitHub</a>
       </div>
     </div>
     <!-- Floating tech pills -->
     <div class="hero-pills">
-      <span class="pill">LUKS Encrypted</span>
+      <span class="pill">SHA256 Encrypted</span>
       <span class="pill">EAS Attested</span>
       <span class="pill">x402 Payments</span>
       <span class="pill">AI Agent</span>
@@ -169,7 +169,7 @@
           <div class="stat-desc">Per-provider attestation on Base Sepolia, signed by the provider wallet, not ours</div>
         </div>
         <div class="stat-card">
-          <div class="stat-num">LUKS</div>
+          <div class="stat-num">SHA256</div>
           <div class="stat-label">Data privacy</div>
           <div class="stat-desc">Filesystem encrypted with your key, generated in your browser, never sent to the server
           </div>
@@ -198,7 +198,7 @@
         <div class="pillar-card">
           <div class="pillar-num">01</div>
           <h3 class="pillar-title">Confidential Containers</h3>
-          <p class="pillar-desc">Every container runs with LUKS2 filesystem encryption. The key is derived from your
+          <p class="pillar-desc">Every container runs with SHA256 filesystem encryption. The key is derived from your
             keypair, generated in-browser, never sent to the server. Even with root access on the host machine, the
             operator cannot read your data.</p>
         </div>
@@ -221,7 +221,7 @@
       <div class="pillar-ctas">
         <a href="http://localhost:3000/signin" target="_blank" rel="noopener noreferrer" class="btn-primary">Deploy
           Now</a>
-        <a href="https://github.com/Arnab-Afk/hackx" target="_blank" rel="noopener noreferrer"
+        <a href="https://github.com/shreejaykurhade/MLX3" target="_blank" rel="noopener noreferrer"
           class="btn-ghost-dark">Read Architecture</a>
       </div>
     </div>
@@ -232,7 +232,7 @@
         <span class="marquee-item">Confidential Containers</span>
         <span class="marquee-item">Agentic Deployment</span>
         <span class="marquee-item">On-Chain Attestation</span>
-        <span class="marquee-item">LUKS Encryption</span>
+        <span class="marquee-item">SHA256 Encryption</span>
         <span class="marquee-item">EAS on Base Sepolia</span>
         <span class="marquee-item">x402 Micropayments</span>
         <span class="marquee-item">ProviderRegistry.sol</span>
@@ -244,7 +244,7 @@
         <span class="marquee-item">Confidential Containers</span>
         <span class="marquee-item">Agentic Deployment</span>
         <span class="marquee-item">On-Chain Attestation</span>
-        <span class="marquee-item">LUKS Encryption</span>
+        <span class="marquee-item">SHA256 Encryption</span>
         <span class="marquee-item">EAS on Base Sepolia</span>
         <span class="marquee-item">x402 Micropayments</span>
         <span class="marquee-item">ProviderRegistry.sol</span>
@@ -343,53 +343,72 @@
       </p>
     </div>
 
-    <div class="orbit-container">
-      <!-- Left nodes -->
-      <div class="orbit-group">
-        <div class="orbit-node">
-          <div class="node-title">AI Agent</div>
-          <div class="node-sub">any client</div>
+    <!-- ── Floating Layer Diagram ── -->
+    <div class="layer-diagram" id="layer-diagram">
+      <!-- SVG connector lines drawn by JS -->
+      <svg class="layer-svg" id="layer-svg" aria-hidden="true"></svg>
+
+      <!-- Column 1: Inputs -->
+      <div class="layer-col layer-col--left">
+        <div class="layer-card" data-col="left" data-idx="0">
+          <div class="lc-icon">🤖</div>
+          <div class="lc-title">AI Agent</div>
+          <div class="lc-sub">any client</div>
         </div>
-        <div class="orbit-node">
-          <div class="node-title">Claude</div>
-          <div class="node-sub">Anthropic</div>
+        <div class="layer-card" data-col="left" data-idx="1">
+          <div class="lc-icon">🐍</div>
+          <div class="lc-title">Python SDK</div>
+          <div class="lc-sub">3.10+</div>
         </div>
-        <div class="orbit-node">
-          <div class="node-title">Python SDK</div>
-          <div class="node-sub">3.10+</div>
+        <div class="layer-card" data-col="left" data-idx="2">
+          <div class="lc-icon">⚡</div>
+          <div class="lc-title">REST API</div>
+          <div class="lc-sub">HTTP/2</div>
         </div>
-        <div class="orbit-node">
-          <div class="node-title">REST API</div>
-          <div class="node-sub">HTTP/2</div>
-        </div>
-        <div class="orbit-node">
-          <div class="node-title">Web UI</div>
-          <div class="node-sub">browser</div>
+        <div class="layer-card" data-col="left" data-idx="3">
+          <div class="lc-icon">🌐</div>
+          <div class="lc-title">Web UI</div>
+          <div class="lc-sub">browser</div>
         </div>
       </div>
-      <!-- Center hub -->
-      <div class="orbit-hub">MLX<span>3</span></div>
-      <!-- Right nodes -->
-      <div class="orbit-group">
-        <div class="orbit-node">
-          <div class="node-title">Docker</div>
-          <div class="node-sub">runtime</div>
+
+      <!-- Column 2: Center Hub -->
+      <div class="layer-col layer-col--center">
+        <div class="layer-hub" id="layer-hub">
+          <div class="hub-glow"></div>
+          <div class="hub-ring hub-ring--1"></div>
+          <div class="hub-ring hub-ring--2"></div>
+          <div class="hub-label">MLX<span>3</span></div>
+          <div class="hub-sub">Trustless Core</div>
         </div>
-        <div class="orbit-node">
-          <div class="node-title">LUKS2</div>
-          <div class="node-sub">encrypted</div>
+      </div>
+
+      <!-- Column 3: Infrastructure -->
+      <div class="layer-col layer-col--right">
+        <div class="layer-card" data-col="right" data-idx="0">
+          <div class="lc-icon">🐋</div>
+          <div class="lc-title">Docker</div>
+          <div class="lc-sub">runtime</div>
         </div>
-        <div class="orbit-node">
-          <div class="node-title">Base L2</div>
-          <div class="node-sub">Ethereum</div>
+        <div class="layer-card" data-col="right" data-idx="1">
+          <div class="lc-icon">🔐</div>
+          <div class="lc-title">SHA256</div>
+          <div class="lc-sub">encrypted</div>
         </div>
-        <div class="orbit-node">
-          <div class="node-title">EAS</div>
-          <div class="node-sub">attestation</div>
+        <div class="layer-card" data-col="right" data-idx="2">
+          <div class="lc-icon">⛓️</div>
+          <div class="lc-title">Base L2</div>
+          <div class="lc-sub">Ethereum</div>
         </div>
-        <div class="orbit-node">
-          <div class="node-title">x402</div>
-          <div class="node-sub">payments</div>
+        <div class="layer-card" data-col="right" data-idx="3">
+          <div class="lc-icon">📜</div>
+          <div class="lc-title">EAS</div>
+          <div class="lc-sub">attestation</div>
+        </div>
+        <div class="layer-card" data-col="right" data-idx="4">
+          <div class="lc-icon">💸</div>
+          <div class="lc-title">x402</div>
+          <div class="lc-sub">payments</div>
         </div>
       </div>
     </div>
@@ -426,7 +445,7 @@
       <div class="faq-layout">
         <div class="faq-sidebar">
           <h2 class="faq-heading">Frequently Asked Questions</h2>
-          <p class="faq-link-text">More questions? <a href="https://github.com/Arnab-Afk/hackx" target="_blank"
+          <p class="faq-link-text">More questions? <a href="https://github.com/shreejaykurhade/MLX3" target="_blank"
               rel="noopener noreferrer">Open an issue on GitHub</a>.</p>
         </div>
         <div class="faq-list">
@@ -436,7 +455,7 @@
             </button>
             <div class="faq-answer">
               MLX3 is a trustless agentic cloud platform. You describe your stack in plain English, and an AI agent
-              deploys it in under 60 seconds using LUKS-encrypted containers with per-provider on-chain EAS attestation
+              deploys it in under 60 seconds using SHA256-encrypted containers with per-provider on-chain EAS attestation
               and x402 micropayments — so you can verify everything that ran.
             </div>
           </div>
@@ -446,7 +465,7 @@
             </button>
             <div class="faq-answer">
               AWS and GCP require you to trust them. MLX3 proves you don't have to: your container filesystem is
-              LUKS-encrypted with a key only you possess, every agent action is merkle-attested on-chain, and payments
+              SHA256-encrypted with a key only you possess, every agent action is merkle-attested on-chain, and payments
               are per-request with no lock-in.
             </div>
           </div>
@@ -455,7 +474,7 @@
               <span>How do you guarantee you cannot see my data?</span><span class="faq-icon">+</span>
             </button>
             <div class="faq-answer">
-              Your keypair is generated in your browser and never sent to our servers. Your container's LUKS2 encryption
+              Your keypair is generated in your browser and never sent to our servers. Your container's SHA256 encryption
               key is derived from that keypair. Even with root access on the physical host, the operator sees only
               encrypted bytes.
             </div>
@@ -507,7 +526,7 @@
       <div class="cta-buttons">
         <a href="http://localhost:3000/signin" target="_blank" rel="noopener noreferrer"
           class="btn-primary btn-xl">Launch App →</a>
-        <a href="https://github.com/Arnab-Afk/hackx" target="_blank" rel="noopener noreferrer"
+        <a href="https://github.com/shreejaykurhade/MLX3" target="_blank" rel="noopener noreferrer"
           class="btn-ghost-dark btn-xl">View GitHub</a>
       </div>
     </div>
@@ -523,13 +542,13 @@
         <a href="#how-it-works">How It Works</a>
         <a href="#compare">Compare</a>
         <a href="#faq">FAQ</a>
-        <a href="https://github.com/Arnab-Afk/hackx" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://github.com/shreejaykurhade/MLX3" target="_blank" rel="noopener noreferrer">GitHub</a>
       </div>
       <p class="footer-copy">© 2025 MLX3. Live on Base Sepolia.</p>
     </div>
   </footer>
 
-  <script src="main.js?v=5"></script>
+  <script src="main.js?v=10"></script>
 </body>
 
 </html>

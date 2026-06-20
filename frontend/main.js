@@ -93,16 +93,88 @@ document.addEventListener('DOMContentLoaded', () => {
 <span class="ln">11</span><span class="comment"># for agent actions and progress</span>`
   };
 
+  let activeTypingTimeout = null;
+
+  function typeCode(htmlContent) {
+    if (!codeContent) return;
+
+    if (activeTypingTimeout) {
+      clearTimeout(activeTypingTimeout);
+    }
+
+    codeContent.innerHTML = htmlContent;
+
+    // Get all text nodes recursively
+    const textNodes = [];
+    function getTextNodes(node) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        textNodes.push(node);
+      } else {
+        for (let i = 0; i < node.childNodes.length; i++) {
+          getTextNodes(node.childNodes[i]);
+        }
+      }
+    }
+    getTextNodes(codeContent);
+
+    // Save original contents and empty the nodes
+    const originalTexts = textNodes.map(node => node.nodeValue);
+    textNodes.forEach(node => {
+      node.nodeValue = '';
+    });
+
+    // Create the follow-along cursor element
+    const cursor = document.createElement('span');
+    cursor.className = 'typing-cursor';
+
+    let nodeIndex = 0;
+    let charIndex = 0;
+
+    function typeNextChar() {
+      if (nodeIndex >= textNodes.length) {
+        // Done typing, append cursor to the very end of code block
+        codeContent.appendChild(cursor);
+        activeTypingTimeout = null;
+        return;
+      }
+
+      const node = textNodes[nodeIndex];
+      const text = originalTexts[nodeIndex];
+
+      // Move cursor immediately after the current text node
+      if (node.parentNode && node.parentNode !== cursor.parentNode) {
+        node.parentNode.insertBefore(cursor, node.nextSibling);
+      }
+
+      if (charIndex < text.length) {
+        node.nodeValue += text.charAt(charIndex);
+        charIndex++;
+        activeTypingTimeout = setTimeout(typeNextChar, 1.5);
+      } else {
+        nodeIndex++;
+        charIndex = 0;
+        typeNextChar();
+      }
+    }
+
+    typeNextChar();
+  }
+
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
       tabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       const lang = tab.textContent.trim();
       if (codeContent && codeSnippets[lang]) {
-        codeContent.innerHTML = codeSnippets[lang];
+        typeCode(codeSnippets[lang]);
       }
     });
   });
+
+  // Type default Python snippet on load
+  if (codeContent && codeSnippets['Python']) {
+    typeCode(codeSnippets['Python']);
+  }
 
   // ── Scroll Reveal (Intersection Observer) ──
   // Apply reveal to inner containers only so section backgrounds stay visible while scrolling
@@ -325,4 +397,266 @@ document.addEventListener('DOMContentLoaded', () => {
       updateCursor(isHovering ? null : activeTab);
     });
   }
+
+  // ── Ethereal Shadow Background for Dark Sections ──
+  (function initEtherealShadows() {
+    // Dark sections that should get the ethereal background
+    const darkSections = [
+      document.querySelector('.hero'),
+      document.getElementById('how-it-works'),
+      document.getElementById('ecosystem'),
+      document.querySelector('.cta-section')
+    ].filter(Boolean);
+
+    // Helper to map a value from one range to another
+    function mapRange(value, fromLow, fromHigh, toLow, toHigh) {
+      if (fromLow === fromHigh) return toLow;
+      const pct = (value - fromLow) / (fromHigh - fromLow);
+      return toLow + pct * (toHigh - toLow);
+    }
+
+    const animScale = 100;  // animation scale (1-100)
+    const animSpeed = 90;   // animation speed (1-100)
+    const displacementScale = mapRange(animScale, 1, 100, 20, 100);
+    const duration = mapRange(animSpeed, 1, 100, 1000, 50);
+    const baseFreqX = mapRange(animScale, 0, 100, 0.001, 0.0005);
+    const baseFreqY = mapRange(animScale, 0, 100, 0.004, 0.002);
+
+    // Track all feColorMatrix elements for animation
+    const colorMatrixElements = [];
+
+    darkSections.forEach((section, idx) => {
+      const filterId = `ethereal-filter-${idx}`;
+
+      // Create SVG filter
+      const svgNS = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(svgNS, 'svg');
+      svg.style.position = 'absolute';
+      svg.style.width = '0';
+      svg.style.height = '0';
+      svg.style.overflow = 'hidden';
+
+      const defs = document.createElementNS(svgNS, 'defs');
+      const filter = document.createElementNS(svgNS, 'filter');
+      filter.setAttribute('id', filterId);
+
+      const feTurbulence = document.createElementNS(svgNS, 'feTurbulence');
+      feTurbulence.setAttribute('result', 'undulation');
+      feTurbulence.setAttribute('numOctaves', '2');
+      feTurbulence.setAttribute('baseFrequency', `${baseFreqX},${baseFreqY}`);
+      feTurbulence.setAttribute('seed', '0');
+      feTurbulence.setAttribute('type', 'turbulence');
+
+      const feColorMatrix1 = document.createElementNS(svgNS, 'feColorMatrix');
+      feColorMatrix1.setAttribute('in', 'undulation');
+      feColorMatrix1.setAttribute('type', 'hueRotate');
+      feColorMatrix1.setAttribute('values', '180');
+      colorMatrixElements.push(feColorMatrix1);
+
+      const feColorMatrix2 = document.createElementNS(svgNS, 'feColorMatrix');
+      feColorMatrix2.setAttribute('in', 'dist');
+      feColorMatrix2.setAttribute('result', 'circulation');
+      feColorMatrix2.setAttribute('type', 'matrix');
+      feColorMatrix2.setAttribute('values', '4 0 0 0 1  4 0 0 0 1  4 0 0 0 1  1 0 0 0 0');
+
+      const feDisplace1 = document.createElementNS(svgNS, 'feDisplacementMap');
+      feDisplace1.setAttribute('in', 'SourceGraphic');
+      feDisplace1.setAttribute('in2', 'circulation');
+      feDisplace1.setAttribute('scale', displacementScale);
+      feDisplace1.setAttribute('result', 'dist');
+
+      const feDisplace2 = document.createElementNS(svgNS, 'feDisplacementMap');
+      feDisplace2.setAttribute('in', 'dist');
+      feDisplace2.setAttribute('in2', 'undulation');
+      feDisplace2.setAttribute('scale', displacementScale);
+      feDisplace2.setAttribute('result', 'output');
+
+      filter.appendChild(feTurbulence);
+      filter.appendChild(feColorMatrix1);
+      filter.appendChild(feColorMatrix2);
+      filter.appendChild(feDisplace1);
+      filter.appendChild(feDisplace2);
+      defs.appendChild(filter);
+      svg.appendChild(defs);
+
+      // Build overlay DOM
+      const overlay = document.createElement('div');
+      overlay.className = 'ethereal-overlay';
+
+      const inner = document.createElement('div');
+      inner.className = 'ethereal-inner';
+      inner.style.filter = `url(#${filterId}) blur(4px)`;
+
+      const colorDiv = document.createElement('div');
+      colorDiv.className = 'ethereal-color';
+      colorDiv.style.backgroundColor = 'rgba(128, 128, 128, 1)';
+
+      inner.appendChild(colorDiv);
+      overlay.appendChild(svg);
+      overlay.appendChild(inner);
+
+      // Add noise layer
+      const noiseDiv = document.createElement('div');
+      noiseDiv.className = 'ethereal-noise';
+      overlay.appendChild(noiseDiv);
+
+      // Insert at the beginning of the section so it's behind all content
+      section.insertBefore(overlay, section.firstChild);
+    });
+
+    // Animate hueRotate for all feColorMatrix elements
+    let hueValue = 0;
+    const rotateSpeed = duration / 25; // seconds per full rotation
+    let lastTime = performance.now();
+
+    function animateHue(now) {
+      const delta = (now - lastTime) / 1000; // seconds
+      lastTime = now;
+      hueValue = (hueValue + (360 * delta) / rotateSpeed) % 360;
+
+      for (let i = 0; i < colorMatrixElements.length; i++) {
+        colorMatrixElements[i].setAttribute('values', String(hueValue));
+      }
+
+      requestAnimationFrame(animateHue);
+    }
+
+    requestAnimationFrame(animateHue);
+  })();
+
+  // ── 3D Scroll Animation for Interactive Cards (Table & Code Box) ──
+  (function initCardScrollAnimations() {
+    const cards = [
+      document.querySelector('.table-wrapper'),
+      document.querySelector('.code-block')
+    ].filter(Boolean);
+
+    if (cards.length === 0) return;
+
+    // Aceternity shadow styles
+    const shadowVal = "0 0 #0000004d, 0 9px 20px #0000004a, 0 37px 37px #00000042, 0 84px 50px #00000026, 0 149px 60px #0000000a, 0 233px 65px #00000003";
+
+    cards.forEach(card => {
+      // Apply initial styles for 3D perspective
+      card.style.transformOrigin = 'top center';
+      card.style.transition = 'transform 0.08s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.1s ease';
+      card.style.boxShadow = shadowVal;
+    });
+
+    function handleScroll() {
+      const viewportHeight = window.innerHeight;
+
+      cards.forEach(card => {
+        const rect = card.getBoundingClientRect();
+
+        // Start animating when the card top enters the screen, and settle when it reaches 15% from the top
+        const startAnimY = viewportHeight;
+        const endAnimY = viewportHeight * 0.15;
+
+        // Calculate progress (from 1 when far down, to 0 when scrolled up)
+        let progress = (rect.top - endAnimY) / (startAnimY - endAnimY);
+        progress = Math.max(0, Math.min(1, progress));
+
+        // Map progress to rotation and scale
+        // When progress = 1 (bottom of screen): rotateX = 16deg, scale = 1.04
+        // When progress = 0 (top of screen): rotateX = 0deg, scale = 1.0
+        const rotateX = progress * 16; // 0 to 16 degrees for a sleek tilt
+        const scale = 1 + progress * 0.04; // 1.0 to 1.04
+        const translateY = progress * -20; // 0 to -20px translation
+
+        card.style.transform = `perspective(1200px) rotateX(${rotateX}deg) scale(${scale}) translateY(${translateY}px)`;
+      });
+    }
+
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+    
+    // Run once on load
+    handleScroll();
+  })();
+
+  // ── Layer Diagram SVG Connectors ──
+  (function initLayerDiagram() {
+    const diagram = document.getElementById('layer-diagram');
+    const svg     = document.getElementById('layer-svg');
+    const hub     = document.getElementById('layer-hub');
+    if (!diagram || !svg || !hub) return;
+
+    function getCenter(el) {
+      const dr = diagram.getBoundingClientRect();
+      const er = el.getBoundingClientRect();
+      return {
+        x: er.left + er.width  / 2 - dr.left,
+        y: er.top  + er.height / 2 - dr.top,
+      };
+    }
+
+    function makePath(x1, y1, x2, y2, delay, dir) {
+      // Cubic bezier — control points pulled horizontally toward center
+      const cx1 = x1 + (x2 - x1) * 0.55;
+      const cx2 = x2 - (x2 - x1) * 0.55;
+      const d = `M${x1},${y1} C${cx1},${y1} ${cx2},${y2} ${x2},${y2}`;
+
+      // Dim base line
+      const base = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      base.setAttribute('d', d);
+      base.setAttribute('fill', 'none');
+      base.setAttribute('stroke', 'rgba(120,80,255,0.08)');
+      base.setAttribute('stroke-width', '1');
+      svg.appendChild(base);
+
+      // Animated pulse line
+      const pulse = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      pulse.setAttribute('d', d);
+      pulse.setAttribute('fill', 'none');
+      pulse.setAttribute('stroke', 'rgba(140,100,255,0.55)');
+      pulse.setAttribute('stroke-width', '1.5');
+      pulse.setAttribute('stroke-linecap', 'round');
+
+      const len = 300;
+      pulse.setAttribute('stroke-dasharray', `18 ${len}`);
+      const offset = dir === 'ltr' ? len : -len;
+      pulse.style.animation = `flowLine 2.6s linear infinite ${delay}s`;
+      pulse.style.setProperty('--flow-from', `${offset}`);
+      pulse.style.setProperty('--flow-to',   `${-offset}`);
+      svg.appendChild(pulse);
+    }
+
+    // Inject keyframes dynamically (once)
+    if (!document.getElementById('flow-style')) {
+      const s = document.createElement('style');
+      s.id = 'flow-style';
+      s.textContent = `
+        @keyframes flowLine {
+          from { stroke-dashoffset: var(--flow-from); }
+          to   { stroke-dashoffset: var(--flow-to); }
+        }
+      `;
+      document.head.appendChild(s);
+    }
+
+    function draw() {
+      svg.innerHTML = '';
+      const hc = getCenter(hub);
+
+      // Left cards → hub
+      document.querySelectorAll('.layer-col--left .layer-card').forEach((card, i) => {
+        const cc = getCenter(card);
+        makePath(cc.x + 55, cc.y, hc.x - 75, hc.y, i * 0.4, 'ltr');
+      });
+
+      // Hub → right cards
+      document.querySelectorAll('.layer-col--right .layer-card').forEach((card, i) => {
+        const cc = getCenter(card);
+        makePath(hc.x + 75, hc.y, cc.x - 55, cc.y, i * 0.35 + 0.2, 'rtl');
+      });
+    }
+
+    // Initial draw after layout settles
+    requestAnimationFrame(() => { requestAnimationFrame(draw); });
+
+    // Redraw on resize
+    const ro = new ResizeObserver(draw);
+    ro.observe(diagram);
+  })();
 });
