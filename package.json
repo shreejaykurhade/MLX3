@@ -1,12 +1,17 @@
 {
-  "name": "comput3-landing",
-  "version": "1.0.0",
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "start": "npm run start --prefix frontend",
-    "dev": "npm run dev --prefix frontend"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
-    "framer-motion": "^12.40.0",
-    "http-server": "^14.1.1"
+    "framer-motion": "^11.0.0",
+    "next": "14.2.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   }
 }
