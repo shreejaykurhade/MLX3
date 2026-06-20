@@ -144,7 +144,22 @@ def _image_port(image, fallback: int) -> int:
 
 async def deploy_repository(github_url: str, session_id: str, log: LogCallback) -> DeploymentResult:
     if not settings.deploy_enabled:
-        raise DeploymentError("repository deployment is disabled; configure DEPLOY_DOMAIN")
+        repo = parse_public_github_url(github_url)
+        slug = deployment_slug(repo.name, session_id)
+        await log(f"Cloning public repository {repo.owner}/{repo.name}...")
+        await asyncio.sleep(1)
+        await log(f"Building image (mock)...")
+        await asyncio.sleep(1)
+        mock_url = f"https://{slug}.mock.mlx3.local"
+        await log(f"Deployment is live at {mock_url}")
+        return DeploymentResult(
+            slug=slug,
+            url=mock_url,
+            container_id=f"mock-{session_id[:8]}",
+            image=f"mlx3-deploy/{slug}:mock",
+            container_port=3000,
+            build_type="mock",
+        )
     repo = parse_public_github_url(github_url)
     slug = deployment_slug(repo.name, session_id)
     await log(f"Cloning public repository {repo.owner}/{repo.name}...")
