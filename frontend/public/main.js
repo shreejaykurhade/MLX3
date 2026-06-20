@@ -182,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#features .container'),
     document.querySelector('#how-it-works .container'),
     document.querySelector('#compare .container'),
-    document.querySelector('#ecosystem .container'),
     document.querySelector('#faq .container'),
     document.querySelector('.cta-section .container')
   ].filter(Boolean);
@@ -404,7 +403,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const darkSections = [
       document.querySelector('.hero'),
       document.getElementById('how-it-works'),
-      document.getElementById('ecosystem'),
       document.querySelector('.cta-section')
     ].filter(Boolean);
 
@@ -575,88 +573,5 @@ document.addEventListener('DOMContentLoaded', () => {
     handleScroll();
   })();
 
-  // ── Layer Diagram SVG Connectors ──
-  (function initLayerDiagram() {
-    const diagram = document.getElementById('layer-diagram');
-    const svg     = document.getElementById('layer-svg');
-    const hub     = document.getElementById('layer-hub');
-    if (!diagram || !svg || !hub) return;
 
-    function getCenter(el) {
-      const dr = diagram.getBoundingClientRect();
-      const er = el.getBoundingClientRect();
-      return {
-        x: er.left + er.width  / 2 - dr.left,
-        y: er.top  + er.height / 2 - dr.top,
-      };
-    }
-
-    function makePath(x1, y1, x2, y2, delay, dir) {
-      // Cubic bezier — control points pulled horizontally toward center
-      const cx1 = x1 + (x2 - x1) * 0.55;
-      const cx2 = x2 - (x2 - x1) * 0.55;
-      const d = `M${x1},${y1} C${cx1},${y1} ${cx2},${y2} ${x2},${y2}`;
-
-      // Dim base line
-      const base = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      base.setAttribute('d', d);
-      base.setAttribute('fill', 'none');
-      base.setAttribute('stroke', 'rgba(120,80,255,0.08)');
-      base.setAttribute('stroke-width', '1');
-      svg.appendChild(base);
-
-      // Animated pulse line
-      const pulse = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      pulse.setAttribute('d', d);
-      pulse.setAttribute('fill', 'none');
-      pulse.setAttribute('stroke', 'rgba(140,100,255,0.55)');
-      pulse.setAttribute('stroke-width', '1.5');
-      pulse.setAttribute('stroke-linecap', 'round');
-
-      const len = 300;
-      pulse.setAttribute('stroke-dasharray', `18 ${len}`);
-      const offset = dir === 'ltr' ? len : -len;
-      pulse.style.animation = `flowLine 2.6s linear infinite ${delay}s`;
-      pulse.style.setProperty('--flow-from', `${offset}`);
-      pulse.style.setProperty('--flow-to',   `${-offset}`);
-      svg.appendChild(pulse);
-    }
-
-    // Inject keyframes dynamically (once)
-    if (!document.getElementById('flow-style')) {
-      const s = document.createElement('style');
-      s.id = 'flow-style';
-      s.textContent = `
-        @keyframes flowLine {
-          from { stroke-dashoffset: var(--flow-from); }
-          to   { stroke-dashoffset: var(--flow-to); }
-        }
-      `;
-      document.head.appendChild(s);
-    }
-
-    function draw() {
-      svg.innerHTML = '';
-      const hc = getCenter(hub);
-
-      // Left cards → hub
-      document.querySelectorAll('.layer-col--left .layer-card').forEach((card, i) => {
-        const cc = getCenter(card);
-        makePath(cc.x + 55, cc.y, hc.x - 75, hc.y, i * 0.4, 'ltr');
-      });
-
-      // Hub → right cards
-      document.querySelectorAll('.layer-col--right .layer-card').forEach((card, i) => {
-        const cc = getCenter(card);
-        makePath(hc.x + 75, hc.y, cc.x - 55, cc.y, i * 0.35 + 0.2, 'rtl');
-      });
-    }
-
-    // Initial draw after layout settles
-    requestAnimationFrame(() => { requestAnimationFrame(draw); });
-
-    // Redraw on resize
-    const ro = new ResizeObserver(draw);
-    ro.observe(diagram);
-  })();
 });

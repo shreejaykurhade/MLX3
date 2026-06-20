@@ -60,6 +60,7 @@ def require_auth(credentials: HTTPAuthorizationCredentials = Depends(_bearer)) -
         payload = jwt.decode(credentials.credentials, settings.jwt_secret, algorithms=["HS256"])
         address = str(payload["sub"])
     except Exception as exc:
+        print(f"JWT Decode Error: {exc} | Token: {credentials.credentials[:10]}...")
         raise HTTPException(401, "invalid or expired authentication token") from exc
     return address
 

@@ -13,6 +13,11 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
     },
   });
   if (!res.ok) {
+    if (res.status === 401 && typeof window !== "undefined") {
+      window.localStorage.removeItem("mlx3_auth_token");
+      window.localStorage.removeItem("mlx3_siwe_address");
+      window.location.reload();
+    }
     let detail = res.statusText;
     try {
       detail = (await res.json())?.detail ?? detail;

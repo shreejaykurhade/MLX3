@@ -33,51 +33,97 @@ export default function Dashboard() {
   }, [signedIn, address]);
 
   return (
-    <div className="space-y-8">
-      <section className="rounded-2xl border border-edge bg-gradient-to-br from-panel to-bg p-8">
-        <h1 className="max-w-2xl text-3xl font-semibold tracking-tight">
-          Verifiable agent execution on <span className="text-brand">Monad</span>
-        </h1>
-        <p className="mt-2 max-w-2xl text-muted">
-          Submit a task, an AI agent plans and executes it, every action is SHA-256 hashed into a Merkle tree, and the
-          root is committed on-chain — so anyone can verify exactly what the agent did.
-        </p>
-        <div className="mt-5">
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {/* Hero Bento - spans 2 columns */}
+      <section className="bento-card md:col-span-2 lg:col-span-2 relative z-10 flex flex-col justify-between">
+        <div className="absolute inset-0 bg-gradient-to-br from-brand/10 via-bg/0 to-bg/0 pointer-events-none" />
+        <div className="relative z-10">
+          <h1 className="text-3xl font-semibold tracking-tight">
+            Verifiable agent execution on <span className="text-brand font-bold">Monad</span>
+          </h1>
+          <p className="mt-3 text-muted max-w-xl leading-relaxed">
+            Submit a task, an AI agent plans and executes it, every action is SHA-256 hashed into a Merkle tree, and the
+            root is committed on-chain — so anyone can verify exactly what the agent did.
+          </p>
+        </div>
+        
+        <div className="relative z-10 mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
           {!isConnected ? (
             <ConnectButton />
           ) : !signedIn ? (
-            <button onClick={signIn} disabled={signingIn} className="btn-primary">
+            <button onClick={signIn} disabled={signingIn} className="btn-primary shadow-[0_0_20px_rgba(131,110,249,0.3)]">
               {signingIn ? "Signing…" : "Sign in with Ethereum"}
             </button>
           ) : (
-            <Link href="/deploy" className="btn-primary">
+            <Link href="/deploy" className="btn-primary shadow-[0_0_20px_rgba(131,110,249,0.3)] px-6 py-3 text-base">
               New deployment →
             </Link>
           )}
-          {error && <p className="mt-2 text-sm text-bad">{error}</p>}
+          {error && <p className="text-sm text-bad">{error}</p>}
+        </div>
+      </section>
+
+      {/* Network / Status Bento - spans 1 column */}
+      <section className="bento-card flex flex-col justify-between">
+        <div>
+          <h2 className="text-sm font-semibold tracking-wider text-muted uppercase">Network Status</h2>
+          <div className="mt-4 p-4 rounded-xl bg-bg/50 border border-edge/50">
+            {isConnected ? (
+              <NetworkStatus compact />
+            ) : (
+              <div className="flex items-center gap-2 text-sm text-muted">
+                <div className="h-2 w-2 rounded-full bg-bad/50"></div>
+                Not connected
+              </div>
+            )}
+          </div>
         </div>
         {isConnected && (
-          <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-edge pt-4 text-sm">
-            <NetworkStatus compact />
-            <Link href="/setup" className="text-brand2 hover:underline">
-              Need testnet MON? Get it on Setup →
+          <div className="mt-6 border-t border-edge/50 pt-4">
+            <Link href="/setup" className="group flex items-center justify-between text-sm text-brand hover:text-brand2 transition-colors">
+              <span>Need testnet MON?</span>
+              <span className="transform transition-transform group-hover:translate-x-1">→</span>
             </Link>
           </div>
         )}
       </section>
 
-      <section>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Compute providers</h2>
-          <span className="text-xs text-muted">{onChain ? "live from ProviderRegistry" : "default (registry not deployed)"}</span>
+      {/* Providers Bento - spans 2 columns */}
+      <section className="bento-card md:col-span-2 flex flex-col">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-ok animate-pulse"></div>
+            <h2 className="text-lg font-semibold tracking-tight">Compute Network</h2>
+          </div>
+          <span className="rounded-full bg-panel px-3 py-1 text-[10px] uppercase tracking-wider text-muted border border-edge">
+            {onChain ? "Live" : "Default"}
+          </span>
         </div>
-        {providers === null ? <Spinner /> : <ProviderList providers={providers} onChain={onChain} />}
+        <div className="flex-1">
+          {providers === null ? (
+            <div className="flex h-32 items-center justify-center"><Spinner /></div>
+          ) : (
+            <ProviderList providers={providers} onChain={onChain} />
+          )}
+        </div>
       </section>
 
+      {/* Sessions Bento - spans 1 column or stretches */}
       {isConnected && signedIn && (
-        <section>
-          <h2 className="mb-3 text-lg font-semibold">Your recent sessions</h2>
-          {sessions === null ? <Spinner /> : <SessionList sessions={sessions} />}
+        <section className="bento-card md:col-span-2 lg:col-span-1 flex flex-col max-h-[400px]">
+          <h2 className="mb-4 text-lg font-semibold tracking-tight">Recent Sessions</h2>
+          <div className="flex-1 overflow-y-auto scroll-thin pr-2">
+            {sessions === null ? (
+              <div className="flex h-32 items-center justify-center"><Spinner /></div>
+            ) : sessions.length === 0 ? (
+              <div className="flex h-32 flex-col items-center justify-center rounded-xl border border-dashed border-edge/50 text-center">
+                <span className="text-muted text-sm mb-2">No history</span>
+                <Link href="/deploy" className="text-brand text-xs hover:underline">Start a task</Link>
+              </div>
+            ) : (
+              <SessionList sessions={sessions} />
+            )}
+          </div>
         </section>
       )}
     </div>

@@ -7,7 +7,7 @@ import { useAccount } from "wagmi";
 import { useAuth } from "./AuthProvider";
 
 const NAV = [
-  { href: "/", label: "Dashboard" },
+  { href: "/dashboard", label: "Dashboard" },
   { href: "/deploy", label: "Deploy" },
   { href: "/audit", label: "Audit" },
   { href: "/setup", label: "Setup" },
@@ -22,12 +22,12 @@ export function Header() {
     <header className="border-b border-edge bg-panel/60 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2">
+          <a href="/" className="flex items-center gap-2">
             <span className="grid h-7 w-7 place-items-center rounded-md bg-brand font-bold text-white">M</span>
             <span className="text-lg font-semibold tracking-tight">
               MLX<span className="text-brand">3</span>
             </span>
-          </Link>
+          </a>
           <nav className="hidden gap-1 sm:flex">
             {NAV.map((n) => {
               const active = n.href === "/" ? pathname === "/" : pathname.startsWith(n.href);

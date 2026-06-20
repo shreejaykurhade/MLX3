@@ -16,49 +16,47 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── Console (light brand kit) ───────────────────────────────────────────
-   The new dashboard renders inside `.console-scope`, which flips the palette
-   to the warm light theme WITHOUT affecting the original dark MLX3 pages. */
-.console-scope {
-  color-scheme: light;
-  background-color: #faf8f5;
-  color: #16130f;
-  -webkit-font-smoothing: antialiased;
-}
-.console-scope ::selection {
-  background: #f5e4dc;
-  color: #16130f;
-}
-
 @layer components {
-  /* legacy MLX3 (dark) primitives — kept so the original pages render */
   .card {
-    @apply rounded-xl border border-edge bg-panel p-5;
+    @apply rounded-2xl border border-edge bg-panel/60 p-6 backdrop-blur-md transition-all duration-300;
+  }
+  .bento-card {
+    @apply rounded-2xl border border-edge bg-panel/40 p-6 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.4)] hover:border-edge/80 relative overflow-hidden;
+  }
+  .bento-card::before {
+    content: "";
+    @apply absolute inset-0 bg-gradient-to-br from-brand/5 to-transparent opacity-0 transition-opacity duration-300 pointer-events-none;
+  }
+  .bento-card:hover::before {
+    @apply opacity-100;
+  }
+  .glass-panel {
+    @apply rounded-xl border border-edge bg-panel2/50 backdrop-blur-lg;
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-primary {
-    @apply btn bg-brand text-white hover:bg-brand2;
+    @apply btn bg-brand text-white hover:bg-brand2 hover:shadow-[0_0_15px_rgba(131,110,249,0.4)] active:scale-95;
   }
   .btn-ghost {
-    @apply btn border border-edge bg-panel2 text-gray-200 hover:border-brand;
+    @apply btn border border-edge bg-panel2/80 text-gray-200 hover:border-brand/50 hover:bg-panel2 hover:text-white active:scale-95 backdrop-blur-sm;
   }
   .btn-danger {
-    @apply btn border border-edge bg-panel2 text-bad hover:border-bad;
+    @apply btn border border-edge bg-panel2/80 text-bad hover:border-bad hover:bg-bad/10 active:scale-95 backdrop-blur-sm;
   }
   .label {
-    @apply text-xs uppercase tracking-wide text-muted;
+    @apply text-xs font-semibold uppercase tracking-wider text-muted;
   }
   .mono {
-    @apply font-mono text-xs;
+    @apply font-mono text-xs tracking-tight;
   }
   .input {
-    @apply w-full rounded-lg border border-edge bg-panel2 px-3 py-2 text-sm text-gray-100 outline-none placeholder:text-muted focus:border-brand;
+    @apply w-full rounded-lg border border-edge bg-panel2/50 px-3 py-2 text-sm text-gray-100 outline-none placeholder:text-muted transition-all focus:border-brand focus:ring-1 focus:ring-brand backdrop-blur-sm;
   }
 }
 
-/* thin scrollbars (used by both themes) */
+/* thin scrollbars for the live log */
 .scroll-thin::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -66,7 +64,4 @@ body {
 .scroll-thin::-webkit-scrollbar-thumb {
   background: #2a2a3a;
   border-radius: 4px;
-}
-.console-scope .scroll-thin::-webkit-scrollbar-thumb {
-  background: #d9d2c6;
 }
