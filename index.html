@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MLX3 — Trustless AI Compute</title>
+  <meta name="description"
+    content="Deploy any repo to verified provider nodes with streaming on-chain payment and EAS attestation on Base Sepolia." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=9" />
+</head>
+
+<body>
+
+  <!-- ── NAV ── -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <span class="nav-logo-wrapper">
+          <video class="nav-logo-video" autoplay loop muted playsinline width="46" height="46">
+            <source src="monadslogo_transparent.webm?v=14" type="video/webm">
+          </video>
+        </span>
+        <span class="nav-logo-text">MLX<span class="logo-3">3</span></span>
+      </a>
+      <div class="nav-links" id="nav-tabs">
+        <a href="#home" class="nav-tab-item" data-index="0">Home</a>
+        <a href="#features" class="nav-tab-item" data-index="1">Features</a>
+        <a href="#how-it-works" class="nav-tab-item" data-index="2">How It Works</a>
+        <a href="#compare" class="nav-tab-item" data-index="3">Compare</a>
+        <a href="#faq" class="nav-tab-item" data-index="4">FAQ</a>
+        <span class="nav-tabs-cursor" id="nav-tabs-cursor"></span>
+      </div>
+      <div class="nav-actions">
+        <a href="https://github.com/Arnab-Afk/hackx" target="_blank" rel="noopener noreferrer" class="btn-ghost">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+            <path
+              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+          </svg>
+          GitHub
+        </a>
+        <a href="http://localhost:3000/signin" target="_blank" rel="noopener noreferrer" class="btn-primary">Launch
+          App</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="hero" id="home">
+    <canvas id="hero-canvas"></canvas>
+    <div class="hero-gradient"></div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Live on Base Sepolia · EAS Attested · x402 Payments
+      </div>
+      <h1 class="hero-heading">
+        Every cloud asks you<br />
+        to <span class="dim-text">trust them.</span>
+      </h1>
+      <p class="hero-sub">We are the only one that proves you cannot.</p>
+      <p class="hero-desc">
+        Describe your stack in plain English. An AI agent deploys it in under 60 seconds with LUKS-encrypted containers,
+        per-provider EAS attestation, and x402 micropayments.
+      </p>
+      <div class="hero-ctas">
+        <a href="http://localhost:3000/signin" target="_blank" rel="noopener noreferrer"
+          class="btn-primary btn-lg">Launch App</a>
+        <a href="https://github.com/Arnab-Afk/hackx" target="_blank" rel="noopener noreferrer"
+          class="btn-outline btn-lg">View on GitHub</a>
+      </div>
+    </div>
+    <!-- Floating tech pills -->
+    <div class="hero-pills">
+      <span class="pill">LUKS Encrypted</span>
+      <span class="pill">EAS Attested</span>
+      <span class="pill">x402 Payments</span>
+      <span class="pill">AI Agent</span>
+    </div>
+  </section>
+
+  <!-- ── SECTION TRANSITION dark→light ── -->
+  <div class="transition-dark-light"></div>
+
+  <!-- ── FEATURES ── -->
+  <section id="features" class="section-light">
+    <div class="container">
+      <p class="section-label">Agentic Deployment SDK</p>
+      <h2 class="section-heading-dark">
+        Describe your stack.<br />
+        <span class="dim-dark">The agent handles everything.</span>
+      </h2>
+      <p class="section-sub-dark">
+        The agent uses Claude with a fixed set of constrained tools. No raw shell access. No filesystem access outside
+        your mounted volume. Every call is logged and the merkle root is attested on-chain.
+      </p>
+
+      <!-- Tool pills -->
+      <div class="tool-pills">
+        <span class="tool-pill">analyze_repo()</span>
+        <span class="tool-pill">select_provider()</span>
+        <span class="tool-pill">create_container()</span>
+        <span class="tool-pill">install_packages()</span>
+        <span class="tool-pill">configure_network()</span>
+        <span class="tool-pill">attach_storage()</span>
+        <span class="tool-pill">setup_ide()</span>
+        <span class="tool-pill">setup_database()</span>
+        <span class="tool-pill">generate_keypair()</span>
+        <span class="tool-pill">health_check()</span>
+        <span class="tool-pill">get_logs()</span>
+        <span class="tool-pill">destroy_container()</span>
+      </div>
+
+      <!-- Code block -->
+      <div class="code-block">
+        <div class="code-tabs">
+          <span class="code-tab active">Python</span>
+          <span class="code-tab">Node.js</span>
+          <span class="code-tab">Go</span>
+          <span class="code-tab">REST</span>
+        </div>
+        <pre
+          class="code-content"><code><span class="ln">1</span><span class="kw">import</span> mlx3
+
+<span class="ln">3</span><span class="cm">client</span> = mlx3.Client(<span class="str">api_key=</span><span class="s">"ck_live_..."</span>)
+
+<span class="ln">6</span><span class="comment"># Natural language deployment</span>
+<span class="ln">7</span><span class="cm">job</span> = <span class="kw">await</span> client.deploy(<span class="s">"""</span>
+<span class="ln">8</span>  React frontend, FastAPI backend with pandas,
+<span class="ln">9</span>  PostgreSQL 16, all connected on an internal network
+<span class="ln">10</span><span class="s">"""</span>)
+
+<span class="ln">12</span><span class="comment"># Agent calls: generate_keypair, select_provider,</span>
+<span class="ln">13</span><span class="comment"># create_container x3, install_packages x2,</span>
+<span class="ln">14</span><span class="comment"># configure_network, setup_ide, attach_storage</span>
+<span class="ln">15</span><span class="comment"># Every call is logged and attested on-chain</span>
+
+<span class="ln">17</span><span class="kw">async for</span> step <span class="kw">in</span> job.stream():
+<span class="ln">18</span>    <span class="kw">print</span>(step.tool, step.status)
+
+<span class="ln">20</span><span class="comment"># Verify the full action log</span>
+<span class="ln">21</span><span class="cm">attestation</span> = <span class="kw">await</span> job.get_attestation()
+<span class="ln">22</span><span class="kw">print</span>(attestation.eas_uid)       <span class="comment"># on Base Sepolia</span>
+<span class="ln">23</span><span class="kw">print</span>(attestation.merkle_root)   <span class="comment"># recompute locally</span></code></pre>
+      </div>
+
+
+
+      <!-- Stat cards -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-num">&lt; 60s</div>
+          <div class="stat-label">Deployment time</div>
+          <div class="stat-desc">From natural language to running encrypted containers with access credentials</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">x402</div>
+          <div class="stat-label">Payment model</div>
+          <div class="stat-desc">HTTP-native per-request micropayments. No central gatekeeper, no lock-in</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">EAS</div>
+          <div class="stat-label">On-chain proof</div>
+          <div class="stat-desc">Per-provider attestation on Base Sepolia, signed by the provider wallet, not ours</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">LUKS</div>
+          <div class="stat-label">Data privacy</div>
+          <div class="stat-desc">Filesystem encrypted with your key, generated in your browser, never sent to the server
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION TRANSITION light→dark ── -->
+  <div class="transition-light-dark"></div>
+
+  <!-- ── HOW IT WORKS ── -->
+  <section id="how-it-works" class="section-dark">
+    <div class="container">
+      <p class="section-label-dark">Three Pillars</p>
+      <h2 class="section-heading-light">
+        Trust is not assumed.<br />
+        <span class="dim-light">It is proven.</span>
+      </h2>
+      <p class="section-sub-light">
+        MLX3 combines three properties no existing platform has together: agentic UX, verifiable confidentiality, and
+        per-provider on-chain attestation.
+      </p>
+
+      <div class="pillars-grid">
+        <div class="pillar-card">
+          <div class="pillar-num">01</div>
+          <h3 class="pillar-title">Confidential Containers</h3>
+          <p class="pillar-desc">Every container runs with LUKS2 filesystem encryption. The key is derived from your
+            keypair, generated in-browser, never sent to the server. Even with root access on the host machine, the
+            operator cannot read your data.</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-num">02</div>
+          <h3 class="pillar-title">Agentic Deployment</h3>
+          <p class="pillar-desc">Describe your stack in plain English. The agent calls a constrained set of tools with
+            no raw shell access and no filesystem access outside your mounted volumes. It cannot do anything you did not
+            ask for.</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-num">03</div>
+          <h3 class="pillar-title">On-Chain Verification</h3>
+          <p class="pillar-desc">Every tool call is appended to an immutable action log. The merkle root of all action
+            hashes is attested on-chain via EAS, signed by the provider wallet, not ours. Recompute the root yourself to
+            verify nothing extra ran.</p>
+        </div>
+      </div>
+
+      <div class="pillar-ctas">
+        <a href="http://localhost:3000/signin" target="_blank" rel="noopener noreferrer" class="btn-primary">Deploy
+          Now</a>
+        <a href="https://github.com/Arnab-Afk/hackx" target="_blank" rel="noopener noreferrer"
+          class="btn-ghost-dark">Read Architecture</a>
+      </div>
+    </div>
+
+    <!-- Marquee -->
+    <div class="marquee-wrapper">
+      <div class="marquee-track">
+        <span class="marquee-item">Confidential Containers</span>
+        <span class="marquee-item">Agentic Deployment</span>
+        <span class="marquee-item">On-Chain Attestation</span>
+        <span class="marquee-item">LUKS Encryption</span>
+        <span class="marquee-item">EAS on Base Sepolia</span>
+        <span class="marquee-item">x402 Micropayments</span>
+        <span class="marquee-item">ProviderRegistry.sol</span>
+        <span class="marquee-item">Permissionless Network</span>
+        <span class="marquee-item">gVisor Sandboxing</span>
+        <span class="marquee-item">Merkle Action Log</span>
+        <span class="marquee-item">Claude Function Calling</span>
+        <span class="marquee-item">Zero Root Access</span>
+        <span class="marquee-item">Confidential Containers</span>
+        <span class="marquee-item">Agentic Deployment</span>
+        <span class="marquee-item">On-Chain Attestation</span>
+        <span class="marquee-item">LUKS Encryption</span>
+        <span class="marquee-item">EAS on Base Sepolia</span>
+        <span class="marquee-item">x402 Micropayments</span>
+        <span class="marquee-item">ProviderRegistry.sol</span>
+        <span class="marquee-item">Permissionless Network</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── COMPARE ── -->
+  <div class="transition-dark-light"></div>
+  <section id="compare" class="section-light">
+    <div class="container">
+      <p class="section-label">Competitive Landscape</p>
+      <h2 class="section-heading-dark">
+        Nobody else does<br />
+        <span class="dim-dark">all four.</span>
+      </h2>
+      <p class="section-sub-dark">
+        Every competitor is missing at least one of: agentic deployment, verifiable confidentiality, per-provider
+        on-chain attestation, or an open permissionless provider network.
+      </p>
+
+      <div class="table-wrapper">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th class="col-feature">Feature</th>
+              <th>AWS / GCP</th>
+              <th>Replit Agent</th>
+              <th>Fluence</th>
+              <th>Phala</th>
+              <th>Akash</th>
+              <th class="col-mlx3">MLX3</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-label"><strong>Agentic Deployment</strong><br /><small>Natural language to running
+                  infrastructure</small></td>
+              <td class="cell-no">No</td>
+              <td class="cell-yes">Yes</td>
+              <td class="cell-no">No</td>
+              <td class="cell-no">No</td>
+              <td class="cell-no">No</td>
+              <td class="cell-mlx3 cell-yes">Yes</td>
+            </tr>
+            <tr>
+              <td class="row-label"><strong>Confidential Compute</strong><br /><small>Operator cannot read your
+                  data</small></td>
+              <td class="cell-no">No</td>
+              <td class="cell-no">No</td>
+              <td class="cell-partial">Roadmap</td>
+              <td class="cell-partial">Partial</td>
+              <td class="cell-no">No</td>
+              <td class="cell-mlx3 cell-yes">Yes</td>
+            </tr>
+            <tr>
+              <td class="row-label"><strong>On-Chain Attestation</strong><br /><small>Cryptographic proof of what the
+                  agent ran</small></td>
+              <td class="cell-no">No</td>
+              <td class="cell-no">No</td>
+              <td class="cell-no">No</td>
+              <td class="cell-partial">Partial</td>
+              <td class="cell-no">No</td>
+              <td class="cell-mlx3 cell-yes">Full</td>
+            </tr>
+            <tr>
+              <td class="row-label"><strong>Open Provider Network</strong><br /><small>Anyone can join as a compute
+                  provider</small></td>
+              <td class="cell-no">No</td>
+              <td class="cell-no">No</td>
+              <td class="cell-yes">Yes</td>
+              <td class="cell-partial">Partial</td>
+              <td class="cell-yes">Yes</td>
+              <td class="cell-mlx3 cell-yes">Yes</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="compare-footnote">MLX3 is the only platform combining all four properties.</p>
+    </div>
+  </section>
+
+  <!-- ── ECOSYSTEM ── -->
+  <div class="transition-light-dark"></div>
+  <section class="section-dark" id="ecosystem">
+    <div class="container text-center">
+      <p class="section-label-dark">Ecosystem</p>
+      <h2 class="section-heading-light">
+        Connect any agent<br />
+        <span class="dim-light">to any verified provider.</span>
+      </h2>
+      <p class="section-sub-light">
+        MLX3 sits between AI agents and compute infrastructure, handling payments, encryption, and attestation
+        transparently.
+      </p>
+    </div>
+
+    <div class="orbit-container">
+      <!-- Left nodes -->
+      <div class="orbit-group">
+        <div class="orbit-node">
+          <div class="node-title">AI Agent</div>
+          <div class="node-sub">any client</div>
+        </div>
+        <div class="orbit-node">
+          <div class="node-title">Claude</div>
+          <div class="node-sub">Anthropic</div>
+        </div>
+        <div class="orbit-node">
+          <div class="node-title">Python SDK</div>
+          <div class="node-sub">3.10+</div>
+        </div>
+        <div class="orbit-node">
+          <div class="node-title">REST API</div>
+          <div class="node-sub">HTTP/2</div>
+        </div>
+        <div class="orbit-node">
+          <div class="node-title">Web UI</div>
+          <div class="node-sub">browser</div>
+        </div>
+      </div>
+      <!-- Center hub -->
+      <div class="orbit-hub">MLX<span>3</span></div>
+      <!-- Right nodes -->
+      <div class="orbit-group">
+        <div class="orbit-node">
+          <div class="node-title">Docker</div>
+          <div class="node-sub">runtime</div>
+        </div>
+        <div class="orbit-node">
+          <div class="node-title">LUKS2</div>
+          <div class="node-sub">encrypted</div>
+        </div>
+        <div class="orbit-node">
+          <div class="node-title">Base L2</div>
+          <div class="node-sub">Ethereum</div>
+        </div>
+        <div class="orbit-node">
+          <div class="node-title">EAS</div>
+          <div class="node-sub">attestation</div>
+        </div>
+        <div class="orbit-node">
+          <div class="node-title">x402</div>
+          <div class="node-sub">payments</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="metrics-strip">
+        <div class="metric">
+          <div class="metric-num">3</div>
+          <div class="metric-label">active providers</div>
+        </div>
+        <div class="metric-divider"></div>
+        <div class="metric">
+          <div class="metric-num">&lt; 60s</div>
+          <div class="metric-label">average deploy</div>
+        </div>
+        <div class="metric-divider"></div>
+        <div class="metric">
+          <div class="metric-num">1 tx</div>
+          <div class="metric-label">per attestation</div>
+        </div>
+        <div class="metric-divider"></div>
+        <div class="metric">
+          <div class="metric-num">0.01 USDC</div>
+          <div class="metric-label">compute per minute</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FAQ ── -->
+  <div class="transition-dark-light"></div>
+  <section id="faq" class="section-light">
+    <div class="container">
+      <div class="faq-layout">
+        <div class="faq-sidebar">
+          <h2 class="faq-heading">Frequently Asked Questions</h2>
+          <p class="faq-link-text">More questions? <a href="https://github.com/Arnab-Afk/hackx" target="_blank"
+              rel="noopener noreferrer">Open an issue on GitHub</a>.</p>
+        </div>
+        <div class="faq-list">
+          <div class="faq-item">
+            <button class="faq-btn" onclick="toggleFaq(this)">
+              <span>What is MLX3?</span><span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              MLX3 is a trustless agentic cloud platform. You describe your stack in plain English, and an AI agent
+              deploys it in under 60 seconds using LUKS-encrypted containers with per-provider on-chain EAS attestation
+              and x402 micropayments — so you can verify everything that ran.
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-btn" onclick="toggleFaq(this)">
+              <span>How is this different from AWS or GCP?</span><span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              AWS and GCP require you to trust them. MLX3 proves you don't have to: your container filesystem is
+              LUKS-encrypted with a key only you possess, every agent action is merkle-attested on-chain, and payments
+              are per-request with no lock-in.
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-btn" onclick="toggleFaq(this)">
+              <span>How do you guarantee you cannot see my data?</span><span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              Your keypair is generated in your browser and never sent to our servers. Your container's LUKS2 encryption
+              key is derived from that keypair. Even with root access on the physical host, the operator sees only
+              encrypted bytes.
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-btn" onclick="toggleFaq(this)">
+              <span>What if the agent does something unexpected?</span><span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              The agent operates with a constrained set of tools — no raw shell access, no filesystem access outside
+              your mounted volume. Every tool call is logged in an immutable action log. The merkle root is attested
+              on-chain, so you can audit exactly what ran.
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-btn" onclick="toggleFaq(this)">
+              <span>What blockchain does MLX3 use?</span><span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              MLX3 uses Base Sepolia (Ethereum L2) for EAS attestations and the ProviderRegistry, DeploymentEscrow, and
+              JobAuction smart contracts. x402 micropayments are HTTP-native and require no gas per request.
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-btn" onclick="toggleFaq(this)">
+              <span>Can I become a compute provider?</span><span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              Yes! Anyone can join as a compute provider by staking USDC in ProviderRegistry.sol. Providers earn x402
+              micropayments for each compute job and build an on-chain reputation through EAS attestations signed by
+              their wallet.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ── -->
+  <div class="transition-light-dark"></div>
+  <section class="section-dark cta-section">
+    <div class="container text-center">
+      <div class="cta-badge">Ready to deploy?</div>
+      <h2 class="cta-heading">
+        Your key.<br />
+        <span class="dim-light">Your cloud.</span>
+      </h2>
+      <p class="cta-sub">Start deploying with cryptographic proof in under 60 seconds.</p>
+      <div class="cta-buttons">
+        <a href="http://localhost:3000/signin" target="_blank" rel="noopener noreferrer"
+          class="btn-primary btn-xl">Launch App →</a>
+        <a href="https://github.com/Arnab-Afk/hackx" target="_blank" rel="noopener noreferrer"
+          class="btn-ghost-dark btn-xl">View GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-logo">MLX<span>3</span></div>
+      <p class="footer-tagline">Trustless Agentic Cloud — every deployment is cryptographically proven.</p>
+      <div class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#compare">Compare</a>
+        <a href="#faq">FAQ</a>
+        <a href="https://github.com/Arnab-Afk/hackx" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </div>
+      <p class="footer-copy">© 2025 MLX3. Live on Base Sepolia.</p>
+    </div>
+  </footer>
+
+  <script src="main.js?v=5"></script>
+</body>
+
+</html>

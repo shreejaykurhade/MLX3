@@ -1,0 +1,12 @@
+{
+  "name": "comput3-landing",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "http-server . -p 3000",
+    "dev": "http-server . -p 3000"
+  },
+  "dependencies": {
+    "framer-motion": "^12.40.0",
+    "http-server": "^14.1.1"
+  }
+}
